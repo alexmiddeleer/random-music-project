@@ -1,3 +1,4 @@
+import { installHappyBirthdayPoc } from './app/happy-birthday-poc';
 import { createInstrumentApp } from './app/instrument-app';
 import { createWebAudioInstrumentSound } from './instrument/web-audio-instrument-sound';
 import { createPianoInstrumentPreset } from './presets/piano-instrument-preset';
@@ -13,4 +14,9 @@ const preset = createPianoInstrumentPreset();
 createInstrumentApp(root, {
   preset,
   sound: createWebAudioInstrumentSound({ tuning: preset.tuning }),
+});
+
+installHappyBirthdayPoc(root, {
+  preset,
+  createSound: () => createWebAudioInstrumentSound({ tuning: preset.tuning }),
 });
