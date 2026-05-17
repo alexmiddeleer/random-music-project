@@ -17,7 +17,7 @@ button {
   font: inherit;
 }
 
-.piano-page {
+.instrument-page {
   min-height: 100vh;
   display: grid;
   align-content: center;
@@ -25,7 +25,7 @@ button {
   padding: clamp(1rem, 4vw, 3rem);
 }
 
-.piano-keyboard {
+.instrument-ui {
   position: relative;
   width: min(100%, 72rem);
   height: clamp(15rem, 34vw, 25rem);
@@ -37,19 +37,19 @@ button {
   overflow: hidden;
 }
 
-.piano-white-key-layer {
+.instrument-ui-base-layer {
   display: grid;
-  grid-template-columns: repeat(14, 1fr);
+  grid-template-columns: repeat(var(--instrument-base-control-count), 1fr);
   height: 100%;
 }
 
-.piano-black-key-layer {
+.instrument-ui-raised-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.piano-key {
+.instrument-control {
   border: 0;
   display: flex;
   flex-direction: column;
@@ -63,21 +63,21 @@ button {
     background 80ms ease;
 }
 
-.piano-key-white {
+.instrument-control-base {
   min-width: 0;
   color: #2b2118;
   background: linear-gradient(180deg, #fffdf8 0%, #f5eddf 78%, #e2d4be 100%);
   border-right: 1px solid #c3b49e;
 }
 
-.piano-key-white:last-child {
+.instrument-control-base:last-child {
   border-right: 0;
 }
 
-.piano-key-black {
+.instrument-control-raised {
   position: absolute;
   top: 0;
-  width: calc(100% / 14 * 0.62);
+  width: calc(100% / var(--instrument-base-control-count) * 0.62);
   height: 62%;
   transform: translateX(-50%);
   z-index: 2;
@@ -88,21 +88,21 @@ button {
   box-shadow: 0 0.8rem 1rem rgb(0 0 0 / 35%);
 }
 
-.piano-key.is-pressed {
+.instrument-control.is-active {
   transform: translateY(0.35rem);
   filter: brightness(0.85) saturate(1.2);
 }
 
-.piano-key-black.is-pressed {
+.instrument-control-raised.is-active {
   transform: translateX(-50%) translateY(0.35rem);
 }
 
-.piano-note-label {
+.instrument-control-label {
   font-size: clamp(0.62rem, 1.2vw, 0.9rem);
   font-weight: 700;
 }
 
-.piano-keyboard-label {
+.instrument-ui-input-label {
   min-width: 1.75rem;
   padding: 0.25rem 0.35rem;
   border-radius: 999px;
@@ -112,11 +112,11 @@ button {
   background: rgb(43 33 24 / 12%);
 }
 
-.piano-key-black .piano-keyboard-label {
+.instrument-control-raised .instrument-ui-input-label {
   background: rgb(255 255 255 / 14%);
 }
 
-.piano-disclaimer {
+.instrument-ui-disclaimer {
   justify-self: center;
   margin: 0;
   color: #665644;
@@ -125,7 +125,7 @@ button {
 }
 
 @media (max-width: 45rem) {
-  .piano-page {
+  .instrument-page {
     align-content: start;
     padding-top: 5rem;
   }

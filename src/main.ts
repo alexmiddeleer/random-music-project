@@ -1,8 +1,6 @@
-import { createBrowserKeyboardInput } from './piano/input/browser-keyboard-input';
-import { defaultPianoConfig } from './piano/domain/piano-config';
-import { createPiano } from './piano/domain/piano';
-import { createPianoKeyboardView } from './piano/view/piano-keyboard-view';
-import { createWebAudioPianoSound } from './piano/sound/web-audio-piano-sound';
+import { createInstrumentApp } from './app/instrument-app';
+import { createWebAudioInstrumentSound } from './instrument/web-audio-instrument-sound';
+import { createPianoInstrumentPreset } from './presets/piano-instrument-preset';
 
 const root = document.querySelector<HTMLElement>('#app');
 
@@ -10,18 +8,9 @@ if (!root) {
   throw new Error('Missing #app root element');
 }
 
-const sound = createWebAudioPianoSound(defaultPianoConfig.tuning);
-const piano = createPiano(defaultPianoConfig, sound);
-const view = createPianoKeyboardView(root, piano.getState());
+const preset = createPianoInstrumentPreset();
 
-createBrowserKeyboardInput({
-  keyMap: defaultPianoConfig.keyboardMap,
-  onPress: (keyId) => {
-    piano.pressKey(keyId);
-    view.update(piano.getState());
-  },
-  onRelease: (keyId) => {
-    piano.releaseKey(keyId);
-    view.update(piano.getState());
-  },
+createInstrumentApp(root, {
+  preset,
+  sound: createWebAudioInstrumentSound({ tuning: preset.tuning }),
 });

@@ -1,33 +1,30 @@
-import type { PianoNote, PianoSound, PianoTuning } from '../domain/piano';
+import { defaultTuning, frequencyForNote, type Tuning } from '../music/music';
+import type { InstrumentSound, Control, VoiceId } from './instrument';
 
 type ActiveVoice = {
   oscillator: OscillatorNode;
   gain: GainNode;
 };
 
-const defaultTuning: PianoTuning = {
-  a4Frequency: 440,
-  a4MidiNumber: 69,
+type WebAudioInstrumentSoundOptions = {
+  tuning?: Tuning;
+  createAudioContext?: () => AudioContext;
 };
 
-export function createWebAudioPianoSound(tuning = defaultTuning): PianoSound {
+export function createWebAudioInstrumentSound({
+  tuning = defaultTuning,
+  createAudioContext = () => new AudioContext(),
+}: WebAudioInstrumentSoundOptions = {}): InstrumentSound {
   let audioContext: AudioContext | undefined;
-  const activeVoices = new Map<string, ActiveVoice>();
+  let nextVoiceNumber = 1;
+  const activeVoices = new Map<VoiceId, ActiveVoice>();
 
   function getAudioContext() {
-    audioContext ??= new AudioContext();
+    audioContext ??= createAudioContext();
     return audioContext;
   }
 
-  function midiToFrequency(midiNumber: number) {
-    return tuning.a4Frequency * 2 ** ((midiNumber - tuning.a4MidiNumber) / 12);
-  }
-
-  function start(note: PianoNote) {
-    if (activeVoices.has(note.name)) {
-      return;
-    }
-
+  function startVoice(element: Control): VoiceId {
     const context = getAudioContext();
     void context.resume();
 
@@ -36,7 +33,7 @@ export function createWebAudioPianoSound(tuning = defaultTuning): PianoSound {
     const now = context.currentTime;
 
     oscillator.type = 'triangle';
-    oscillator.frequency.value = midiToFrequency(note.midiNumber);
+    oscillator.frequency.value = element.note ? frequencyForNote(element.note, tuning) : 220;
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(0.25, now + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.12, now + 0.12);
@@ -45,11 +42,13 @@ export function createWebAudioPianoSound(tuning = defaultTuning): PianoSound {
     gain.connect(context.destination);
     oscillator.start(now);
 
-    activeVoices.set(note.name, { oscillator, gain });
+    const voiceId = `voice-${nextVoiceNumber++}`;
+    activeVoices.set(voiceId, { oscillator, gain });
+    return voiceId;
   }
 
-  function stop(note: PianoNote) {
-    const voice = activeVoices.get(note.name);
+  function stopVoice(voiceId: VoiceId) {
+    const voice = activeVoices.get(voiceId);
 
     if (!voice || !audioContext) {
       return;
@@ -61,11 +60,8 @@ export function createWebAudioPianoSound(tuning = defaultTuning): PianoSound {
     voice.gain.gain.setValueAtTime(voice.gain.gain.value, now);
     voice.gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
     voice.oscillator.stop(now + 0.09);
-    activeVoices.delete(note.name);
+    activeVoices.delete(voiceId);
   }
 
-  return {
-    start,
-    stop,
-  };
+  return { startVoice, stopVoice };
 }

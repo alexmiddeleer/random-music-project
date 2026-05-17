@@ -1,6 +1,6 @@
-# Piano
+# Audio Instrument
 
-A web app project for a keyboard-playable piano.
+A web app for browser-playable audio instruments, starting with a piano preset and shaped to support more instruments, sheet music, and composition tools.
 
 ## Requirements
 
@@ -24,4 +24,4 @@ mise exec -- pnpm preview
 
 ## Project Status
 
-This repository currently contains only the package and toolchain setup. The web app implementation has not been added yet.
+The app currently boots a two-octave piano preset through generic Instrument, Control, Input Mapping, Voice, and Composition modules.
